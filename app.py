@@ -2,11 +2,8 @@
 from dash import Dash
 from dash import dcc
 from dash import html
-
-# pour le backend
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
-import random
 import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
@@ -17,14 +14,14 @@ pd.options.display.max_colwidth = 200
 
 
 # DATA
-df_display_film_30ans = pd.read_csv("datasets/df_30ans_image_syn_ml_vid.csv")
-df_kids = pd.read_csv("datasets/df_kids_image_syn_ml_vid.csv")
-df_family = pd.read_csv("datasets/df_family_image_syn_ml_vid.csv")
-df_recent = pd.read_csv("datasets/df_2ans_image_syn_ml_vid.csv")
-df_horror = pd.read_csv("datasets/df_horror_image_syn_ml_vid.csv")
-df_old_movies = pd.read_csv("datasets/df_old_image_syn_ml_vid.csv")
+df_30years = pd.read_csv("datasets/movies_30years.csv")
+df_kids = pd.read_csv("datasets/movies_kids.csv")
+df_family = pd.read_csv("datasets/movies_family.csv")
+df_recent = pd.read_csv("datasets/movies_recent.csv")
+df_horror = pd.read_csv("datasets/movies_horror.csv")
+df_old_movies = pd.read_csv("datasets/movies_old.csv")
 
-# Function to create a list with dictionaries of titles and tconst
+# Function to create a list with dictionaries of titles and tconst (movie IDs)
 def list_titles(df):
     """The function creates a list of dictionaries to pass to the dropdown menu to choose a movie"""
     lst_tconst = list(df["tconst"])
@@ -39,7 +36,7 @@ def list_titles(df):
     return lst_options_films
 
 
-# Function to clean pays_prod
+# Function to clean the list of production countries in the tables
 def list_to_str(country):
     """The function takes a list of countries and returns a string without punctuation"""
     punctuation = '''[]'"'''
@@ -49,13 +46,13 @@ def list_to_str(country):
     return country
 
 
-# Creating a df and list with only tconst and titles for dropdown menu sorted alphabetically
+# Creating a dataframe and list with only tconst and titles for all movies for the dropdown menu sorted alphabetically
 df_full = pd.DataFrame()
 for df in (
     df_kids,
     df_family,
     df_recent,
-    df_display_film_30ans,
+    df_30years,
     df_horror,
     df_old_movies,
 ):
@@ -253,8 +250,8 @@ main_page = html.Div(
                                 html.A(
                                     html.Img(
                                         src=np.array(
-                                            df_display_film_30ans[
-                                                df_display_film_30ans["tconst"]
+                                            df_30years[
+                                                df_30years["tconst"]
                                                 == "tt0468569"
                                             ]
                                         )[0, 8],
@@ -265,8 +262,8 @@ main_page = html.Div(
                                 ),
                                 html.P(
                                     np.array(
-                                        df_display_film_30ans[
-                                            df_display_film_30ans["tconst"]
+                                        df_30years[
+                                            df_30years["tconst"]
                                             == "tt0468569"
                                         ]
                                     )[0, 2],
@@ -443,7 +440,7 @@ main_page = html.Div(
                         ),
                         dbc.Col(
                             html.Img(
-                                    src="assets/logo-pandastic-test.png",
+                                    src="assets/logo-pandastic.png",
                                     style={"marginTop": "40px",
                                            "width": "80px"}
                             )
@@ -600,8 +597,8 @@ def infos_movie(value):
             df_infos = df_family.copy()
             seance = "Vous pouvez programmer ce film lors d'une séance pour familles."
 
-        elif value in df_display_film_30ans["tconst"].values:
-            df_infos = df_display_film_30ans.copy()
+        elif value in df_30years["tconst"].values:
+            df_infos = df_30years.copy()
             seance = "Vous pouvez programmer ce film lors d'une séance de films cultes."
 
         elif value in df_recent["tconst"].values:
@@ -695,7 +692,6 @@ def infos_movie(value):
                     "Vous pourriez aussi aimer",
                     style={"marginTop": "30px", "marginBottom": "30px"},
                 ),
-                # html.Div(recos, className="d-grid gap-5 d-md-flex",)
                 dbc.Row([dbc.Col(i) for i in recos_img], style={"textAlign": "center"}),
                 dbc.Row(
                     [dbc.Col(j) for j in recos_title],
@@ -730,8 +726,8 @@ def infos_movie(value):
             df_infos = df_family.copy()
             seance = "Vous pouvez programmer ce film lors d'une séance pour familles."
 
-        elif value in df_display_film_30ans["tconst"].values:
-            df_infos = df_display_film_30ans.copy()
+        elif value in df_30years["tconst"].values:
+            df_infos = df_30years.copy()
             seance = "Vous pouvez programmer ce film lors d'une séance de films cultes."
 
         elif value in df_recent["tconst"].values:
@@ -843,7 +839,7 @@ def infos_movie(value):
     return selection_layout
 
 
-# Callback function to display the wanted page
+# Callback function to display the selected page
 @app.callback(Output("page-content", "children"), Input("url", "pathname"))
 def display_page(pathname):
     if pathname.startswith("/tt"):
@@ -857,8 +853,8 @@ def display_page(pathname):
             df_infos = df_family.copy()
             seance = "Vous pouvez programmer ce film lors d'une séance pour familles."
 
-        elif value in df_display_film_30ans["tconst"].values:
-            df_infos = df_display_film_30ans.copy()
+        elif value in df_30years["tconst"].values:
+            df_infos = df_30years.copy()
             seance = "Vous pouvez programmer ce film lors d'une séance de films cultes."
 
         elif value in df_recent["tconst"].values:
@@ -988,7 +984,7 @@ def display_page(pathname):
             intro = "Dernière sortie : mercredi et samedi soir"
 
         elif pathname == "/films-cultes":
-            df_infos = df_display_film_30ans.copy()
+            df_infos = df_30years.copy()
             infos_film = np.array(df_infos[df_infos["tconst"] == "tt0468569"])
             intro = "Film culte : dimanche soir"
 
@@ -1121,4 +1117,5 @@ def display_page(pathname):
 if __name__ == '__main__':
     app.run_server(debug=True)
 
-#app.run_server(mode="external", port=8080)
+# Code to run app in jupyter lab 
+# app.run_server(mode="external", port=8080)
