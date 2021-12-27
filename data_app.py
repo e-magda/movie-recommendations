@@ -7,20 +7,18 @@ import dash_bootstrap_components as dbc
 import random
 
 
-# Instantiation de l'application dash
+# FRONT-END
 app = Dash(
     __name__, 
     external_stylesheets=[dbc.themes.BOOTSTRAP]
     )
 
-
-# FRONTEND
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
 ])
 
-# Content of the index_page with links to our 2 pages
+# Content of the index_page with links to our 2 pages (data, recommendations)
 index_page = dbc.Container([
     html.Div([
         
@@ -99,7 +97,6 @@ page_1_layout = dbc.Container([
     ]
 )
 
-# Si on a 4 output => on peut avoir 4 Return 
 @app.callback(
     Output("tab-content", "children"),
     Input("tabs", "value")
@@ -107,7 +104,7 @@ page_1_layout = dbc.Container([
 def render_tab_content(active_tab):
     """
     This callback takes the 'active_tab' property as input, as well as the
-    stored graphs, and renders the tab content depending on what the value of 'active_tab' is.
+    stored graphs, and returns the tab content depending on what the value of 'active_tab' is.
     """
     if active_tab == "kpi_cinema":
         return dbc.Row(
@@ -223,10 +220,7 @@ def render_tab_content(active_tab):
             ])
 
 
-
-
-
-# Callback function to display the wanted page
+# Callback function to display the wanted page (page 1 and page 2 are not connected at the moment)
 @app.callback(Output('page-content', 'children'),
               Input('url', 'pathname'))
 def display_page(pathname):
@@ -236,7 +230,6 @@ def display_page(pathname):
         return page_2_layout
     else:
         return index_page
-    # You could also return a 404 "URL not found" page here
 
 
 if __name__ == '__main__':
